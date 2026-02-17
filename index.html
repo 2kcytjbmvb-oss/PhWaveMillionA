@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waves & Sound Millionaire - Version A</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gold: #ffd700;
+            --dark-gold: #b8860b;
+            --neon-blue: #00d4ff;
+            --deep-purple: #1a0033;
+            --rich-blue: #000428;
+            --accent-green: #00ff88;
+            --danger-red: #ff3366;
+            --glass-white: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--rich-blue) 0%, var(--deep-purple) 50%, #0f0c29 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, transparent 0%, var(--rich-blue) 70%),
+                        repeating-conic-gradient(from 0deg, transparent 0deg 10deg, rgba(0, 212, 255, 0.03) 10deg 20deg);
+            animation: rotate 60s linear infinite;
+        }
+
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .spotlight {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .spotlight-1 { top: -200px; left: -200px; animation: pulse 4s ease-in-out infinite; }
+        .spotlight-2 { bottom: -200px; right: -200px; animation: pulse 4s ease-in-out infinite 2s; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+
+        .game-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 0 30px;
+            position: relative;
+        }
+
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, var(--primary-gold), #fff6b0, var(--dark-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(0.9rem, 2vw, 1.2rem);
+            color: var(--neon-blue);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-green), #00aa66);
+            color: #003322;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 30px;
+            flex: 1;
+        }
+
+        @media (max-width: 1000px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .question-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .prize-display {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.05));
+            border: 2px solid var(--primary-gold);
+            border-radius: 15px;
+            padding: 15px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prize-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            100% { left: 100%; }
+        }
+
+        .prize-label {
+            font-size: 0.9rem;
+            color: var(--primary-gold);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .prize-amount {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-gold);
+        }
+
+        .question-box {
+            background: linear-gradient(180deg, rgba(0, 50, 100, 0.6), rgba(0, 20, 60, 0.8));
+            border: 3px solid var(--neon-blue);
+            border-radius: 20px;
+            padding: 35px;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.2),
+                        inset 0 0 60px rgba(0, 212, 255, 0.05);
+        }
+
+        .question-number {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--neon-blue), #0088aa);
+            padding: 5px 25px;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: 500;
+            line-height: 1.6;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .answers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .answer-btn {
+            background: linear-gradient(135deg, rgba(0, 30, 60, 0.9), rgba(0, 50, 80, 0.7));
+            border: 2px solid rgba(0, 212, 255, 0.5);
+            border-radius: 50px;
+            padding: 18px 25px;
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(0, 100, 150, 0.9), rgba(0, 70, 120, 0.7));
+            border-color: var(--neon-blue);
+            transform: scale(1.02);
+            box-shadow: 0 0 25px rgba(0, 212, 255, 0.4);
+        }
+
+        .answer-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .answer-letter {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: var(--primary-gold);
+            min-width: 30px;
+        }
+
+        .answer-btn.selected {
+            background: linear-gradient(135deg, rgba(255, 165, 0, 0.8), rgba(200, 100, 0, 0.6));
+            border-color: var(--primary-gold);
+            animation: selected-pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes selected-pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+        }
+
+        .answer-btn.correct {
+            background: linear-gradient(135deg, rgba(0, 200, 100, 0.9), rgba(0, 150, 80, 0.7));
+            border-color: var(--accent-green);
+            animation: correct-flash 0.5s ease-in-out 3;
+        }
+
+        @keyframes correct-flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .answer-btn.incorrect {
+            background: linear-gradient(135deg, rgba(200, 0, 50, 0.9), rgba(150, 0, 30, 0.7));
+            border-color: var(--danger-red);
+        }
+
+        .answer-btn.eliminated {
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .lifelines {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .lifeline-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, rgba(100, 50, 150, 0.8), rgba(50, 20, 80, 0.9));
+            border: 3px solid rgba(150, 100, 200, 0.5);
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+        }
+
+        .lifeline-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .lifeline-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .lifeline-btn.used {
+            background: linear-gradient(145deg, rgba(50, 50, 50, 0.8), rgba(30, 30, 30, 0.9));
+            border-color: rgba(100, 100, 100, 0.5);
+        }
+
+        .lifeline-icon {
+            font-size: 1.5rem;
+        }
+
+        .money-ladder {
+            background: linear-gradient(180deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 30, 0.95));
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ladder-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: var(--primary-gold);
+            text-align: center;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .ladder-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            background: rgba(0, 50, 80, 0.3);
+            border: 1px solid transparent;
+        }
+
+        .ladder-item.milestone {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .ladder-item.current {
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.4), rgba(0, 150, 200, 0.2));
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            animation: current-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes current-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
+            50% { box-shadow: 0 0 35px rgba(0, 212, 255, 0.5); }
+        }
+
+        .ladder-item.completed {
+            background: rgba(0, 200, 100, 0.2);
+            color: var(--accent-green);
+        }
+
+        .ladder-number {
+            color: rgba(255, 255, 255, 0.5);
+            min-width: 25px;
+        }
+
+        .ladder-amount {
+            font-weight: 700;
+        }
+
+        .ladder-item.milestone .ladder-amount {
+            color: var(--primary-gold);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: linear-gradient(145deg, rgba(20, 40, 80, 0.98), rgba(10, 20, 50, 0.98));
+            border: 3px solid var(--neon-blue);
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 60px rgba(0, 212, 255, 0.3);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .modal-title.win { color: var(--accent-green); }
+        .modal-title.lose { color: var(--danger-red); }
+        .modal-title.info { color: var(--neon-blue); }
+
+        .modal-text {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .modal-amount {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary-gold);
+            margin-bottom: 30px;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, var(--neon-blue), #0088aa);
+            border: none;
+            border-radius: 30px;
+            padding: 15px 40px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .modal-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .modal-btn.gold {
+            background: linear-gradient(135deg, var(--primary-gold), var(--dark-gold));
+            color: #1a0033;
+        }
+
+        .poll-results {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            gap: 10px;
+        }
+
+        .poll-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .poll-bar-container {
+            width: 100%;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .poll-bar-fill {
+            width: 100%;
+            background: linear-gradient(180deg, var(--neon-blue), #0066aa);
+            border-radius: 5px 5px 0 0;
+            transition: height 1s ease;
+        }
+
+        .poll-bar-fill.highlight {
+            background: linear-gradient(180deg, var(--accent-green), #00aa66);
+        }
+
+        .poll-label {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: var(--primary-gold);
+        }
+
+        .poll-percent {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .friend-message {
+            background: rgba(0, 50, 100, 0.3);
+            border-left: 4px solid var(--neon-blue);
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            font-style: italic;
+            line-height: 1.8;
+        }
+
+        .friend-name {
+            color: var(--primary-gold);
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        .start-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+            text-align: center;
+            gap: 30px;
+        }
+
+        .start-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary-gold), #fff6b0, var(--dark-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: logo-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes logo-glow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5)); }
+            50% { filter: drop-shadow(0 0 40px rgba(255, 215, 0, 0.8)); }
+        }
+
+        .start-subtitle {
+            font-size: 1.5rem;
+            color: var(--neon-blue);
+            letter-spacing: 5px;
+        }
+
+        .start-info {
+            max-width: 600px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            opacity: 0.8;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, var(--primary-gold), var(--dark-gold));
+            border: none;
+            border-radius: 50px;
+            padding: 20px 60px;
+            color: #1a0033;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 20px;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.6);
+        }
+
+        .walk-away-btn {
+            background: linear-gradient(135deg, rgba(100, 0, 50, 0.8), rgba(60, 0, 30, 0.9));
+            border: 2px solid rgba(200, 50, 100, 0.5);
+            border-radius: 30px;
+            padding: 12px 30px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .walk-away-btn:hover {
+            background: linear-gradient(135deg, rgba(150, 0, 70, 0.9), rgba(100, 0, 50, 0.9));
+            border-color: var(--danger-red);
+            box-shadow: 0 0 25px rgba(255, 50, 100, 0.4);
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .wave-decoration {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23001428' fill-opacity='0.5' d='M0,192L48,197.3C96,203,192,213,288,197.3C384,181,480,139,576,138.7C672,139,768,181,864,181.3C960,181,1056,139,1152,128C1248,117,1344,139,1392,149.3L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") no-repeat bottom;
+            background-size: cover;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+    <div class="spotlight spotlight-1"></div>
+    <div class="spotlight spotlight-2"></div>
+    <div class="wave-decoration"></div>
+
+    <div class="game-container">
+        <header class="header">
+            <h1 class="title">Who Wants to Be a Millionaire</h1>
+            <p class="subtitle">Waves & Sound Edition</p>
+            <span class="version-badge">Version A - Standard</span>
+        </header>
+
+        <div id="startScreen" class="start-screen">
+            <div class="start-logo">🌊</div>
+            <h2 class="start-subtitle">Physics Challenge</h2>
+            <p class="start-info">
+                Test your knowledge of waves, sound, and oscillations! Answer 15 questions of increasing difficulty to win the virtual million. 
+                Use your three lifelines wisely: 50:50, Phone a Friend, and Ask the Audience.
+            </p>
+            <button class="start-btn" onclick="startGame()">Start Game</button>
+        </div>
+
+        <div id="gameArea" class="game-area hidden">
+            <div class="question-panel">
+                <div class="prize-display">
+                    <div class="prize-label">Playing For</div>
+                    <div id="currentPrize" class="prize-amount">$100</div>
+                </div>
+
+                <div class="question-box">
+                    <div id="questionNumber" class="question-number">Question 1</div>
+                    <div id="questionText" class="question-text">Loading question...</div>
+                </div>
+
+                <div id="answersGrid" class="answers-grid">
+                    <button class="answer-btn" data-index="0" onclick="selectAnswer(0)">
+                        <span class="answer-letter">A:</span>
+                        <span id="answer0" class="answer-text"></span>
+                    </button>
+                    <button class="answer-btn" data-index="1" onclick="selectAnswer(1)">
+                        <span class="answer-letter">B:</span>
+                        <span id="answer1" class="answer-text"></span>
+                    </button>
+                    <button class="answer-btn" data-index="2" onclick="selectAnswer(2)">
+                        <span class="answer-letter">C:</span>
+                        <span id="answer2" class="answer-text"></span>
+                    </button>
+                    <button class="answer-btn" data-index="3" onclick="selectAnswer(3)">
+                        <span class="answer-letter">D:</span>
+                        <span id="answer3" class="answer-text"></span>
+                    </button>
+                </div>
+
+                <div class="lifelines">
+                    <button id="lifeline5050" class="lifeline-btn" onclick="use5050()">
+                        <span class="lifeline-icon">✂️</span>
+                        <span>50:50</span>
+                    </button>
+                    <button id="lifelinePhone" class="lifeline-btn" onclick="usePhoneFriend()">
+                        <span class="lifeline-icon">📞</span>
+                        <span>Phone</span>
+                    </button>
+                    <button id="lifelineAudience" class="lifeline-btn" onclick="useAskAudience()">
+                        <span class="lifeline-icon">👥</span>
+                        <span>Audience</span>
+                    </button>
+                </div>
+
+                <div class="game-controls">
+                    <button id="confirmBtn" class="modal-btn hidden" onclick="confirmAnswer()">Final Answer</button>
+                    <button class="walk-away-btn" onclick="walkAway()">Walk Away</button>
+                </div>
+            </div>
+
+            <div class="money-ladder">
+                <div class="ladder-title">Prize Ladder</div>
+                <div id="moneyLadder"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultModal" class="modal-overlay">
+        <div class="modal">
+            <h2 id="modalTitle" class="modal-title"></h2>
+            <p id="modalText" class="modal-text"></p>
+            <div id="modalAmount" class="modal-amount"></div>
+            <div id="modalExtra"></div>
+            <button class="modal-btn gold" onclick="playAgain()">Play Again</button>
+        </div>
+    </div>
+
+    <div id="lifelineModal" class="modal-overlay">
+        <div class="modal">
+            <h2 id="lifelineTitle" class="modal-title info"></h2>
+            <div id="lifelineContent"></div>
+            <button class="modal-btn" onclick="closeLifelineModal()">Got It</button>
+        </div>
+    </div>
+
+    <script>
+        const prizeAmounts = [
+            "$100", "$200", "$300", "$500", "$1,000",
+            "$2,000", "$4,000", "$8,000", "$16,000", "$32,000",
+            "$64,000", "$125,000", "$250,000", "$500,000", "$1,000,000"
+        ];
+
+        const milestones = [4, 9, 14];
+
+        // VERSION A - Standard Questions
+        const questions = [
+            // Easy ($100 - $500)
+            {
+                question: "What unit is used to measure frequency?",
+                answers: ["Hertz (Hz)", "Meters (m)", "Seconds (s)", "Newtons (N)"],
+                correct: 0,
+                explanation: "Frequency is measured in Hertz (Hz), which equals cycles per second."
+            },
+            {
+                question: "What is period in wave motion?",
+                answers: ["Distance between crests", "Time for one complete cycle", "Height of a wave", "Speed of a wave"],
+                correct: 1,
+                explanation: "Period is the time it takes for one complete oscillation or cycle."
+            },
+            {
+                question: "In a transverse wave, how do particles move relative to the wave direction?",
+                answers: ["Same direction", "Perpendicular", "At 45 degrees", "They don't move"],
+                correct: 1,
+                explanation: "In transverse waves, particles oscillate perpendicular to the direction of wave propagation."
+            },
+            {
+                question: "What do waves transfer from one place to another?",
+                answers: ["Matter only", "Energy only", "Both matter and energy", "Neither"],
+                correct: 1,
+                explanation: "Waves transfer energy, not matter. The particles oscillate but don't travel with the wave."
+            },
+            {
+                question: "What is the relationship between frequency and period?",
+                answers: ["They are equal", "They are inverses (f = 1/T)", "They are proportional", "No relationship"],
+                correct: 1,
+                explanation: "Frequency and period are inversely related: f = 1/T and T = 1/f"
+            },
+            // Medium ($1,000 - $32,000)
+            {
+                question: "In a longitudinal wave, compressed regions are called:",
+                answers: ["Crests", "Troughs", "Compressions", "Amplitudes"],
+                correct: 2,
+                explanation: "In longitudinal waves, compressed regions are called compressions and spread-out regions are rarefactions."
+            },
+            {
+                question: "What is the highest point of a transverse wave called?",
+                answers: ["Trough", "Amplitude", "Crest", "Node"],
+                correct: 2,
+                explanation: "The highest point is the crest, and the lowest point is the trough."
+            },
+            {
+                question: "When a wave reflects from a FIXED boundary, the reflected wave is:",
+                answers: ["Unchanged", "Inverted (flipped)", "Doubled in amplitude", "Absorbed"],
+                correct: 1,
+                explanation: "Waves hitting a fixed boundary reflect inverted (phase change of 180°)."
+            },
+            {
+                question: "When a wave reflects from a FREE boundary, the reflected wave is:",
+                answers: ["Inverted", "Upright (same orientation)", "Doubled", "Eliminated"],
+                correct: 1,
+                explanation: "Waves hitting a free boundary reflect upright, maintaining their original orientation."
+            },
+            {
+                question: "When two waves with the SAME amplitude meet in the same direction, this is called:",
+                answers: ["Destructive interference", "Constructive interference", "Refraction", "Diffraction"],
+                correct: 1,
+                explanation: "When waves meet with amplitudes in the same direction, they add together (constructive interference)."
+            },
+            // Hard ($64,000 - $1,000,000)
+            {
+                question: "In a standing wave, points with NO oscillation are called:",
+                answers: ["Antinodes", "Nodes", "Crests", "Compressions"],
+                correct: 1,
+                explanation: "Nodes are points of zero displacement. Antinodes are points of maximum displacement."
+            },
+            {
+                question: "What happens to the pitch you hear when a sound source moves TOWARD you?",
+                answers: ["Pitch decreases", "Pitch increases", "Pitch stays the same", "Sound disappears"],
+                correct: 1,
+                explanation: "The Doppler effect causes pitch to increase when the source approaches (higher frequency)."
+            },
+            {
+                question: "What phenomenon occurs when two frequencies close together combine to create a pulsing sound?",
+                answers: ["Resonance", "Beats", "Harmonics", "Refraction"],
+                correct: 1,
+                explanation: "Beats occur when two slightly different frequencies interfere, creating a pulsing pattern."
+            },
+            {
+                question: "For a pipe CLOSED at one end, which harmonics can exist?",
+                answers: ["All harmonics (1, 2, 3...)", "Only odd harmonics (1, 3, 5...)", "Only even harmonics (2, 4, 6...)", "No harmonics"],
+                correct: 1,
+                explanation: "Closed pipes can only support odd harmonics because one end must be a node and the other an antinode."
+            },
+            {
+                question: "What is resonance?",
+                answers: ["When waves cancel out", "When an object vibrates at its natural frequency with increased amplitude", "When waves slow down", "When sound echoes"],
+                correct: 1,
+                explanation: "Resonance occurs when an object is driven at its natural frequency, causing maximum amplitude oscillation."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let selectedAnswer = null;
+        let lifelines = { fiftyFifty: true, phone: true, audience: true };
+        let gameActive = false;
+        let eliminatedAnswers = [];
+
+        function initLadder() {
+            const ladder = document.getElementById('moneyLadder');
+            ladder.innerHTML = '';
+            
+            for (let i = prizeAmounts.length - 1; i >= 0; i--) {
+                const item = document.createElement('div');
+                item.className = 'ladder-item';
+                item.id = `ladder-${i}`;
+                
+                if (milestones.includes(i)) {
+                    item.classList.add('milestone');
+                }
+                
+                item.innerHTML = `
+                    <span class="ladder-number">${i + 1}</span>
+                    <span class="ladder-amount">${prizeAmounts[i]}</span>
+                `;
+                
+                ladder.appendChild(item);
+            }
+            
+            updateLadder();
+        }
+
+        function updateLadder() {
+            for (let i = 0; i < prizeAmounts.length; i++) {
+                const item = document.getElementById(`ladder-${i}`);
+                item.classList.remove('current', 'completed');
+                
+                if (i === currentQuestion) {
+                    item.classList.add('current');
+                } else if (i < currentQuestion) {
+                    item.classList.add('completed');
+                }
+            }
+            
+            document.getElementById('currentPrize').textContent = prizeAmounts[currentQuestion];
+        }
+
+        function startGame() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameArea').classList.remove('hidden');
+            
+            currentQuestion = 0;
+            selectedAnswer = null;
+            lifelines = { fiftyFifty: true, phone: true, audience: true };
+            gameActive = true;
+            eliminatedAnswers = [];
+            
+            document.getElementById('lifeline5050').classList.remove('used');
+            document.getElementById('lifeline5050').disabled = false;
+            document.getElementById('lifelinePhone').classList.remove('used');
+            document.getElementById('lifelinePhone').disabled = false;
+            document.getElementById('lifelineAudience').classList.remove('used');
+            document.getElementById('lifelineAudience').disabled = false;
+            
+            initLadder();
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1}`;
+            document.getElementById('questionText').textContent = q.question;
+            
+            const buttons = document.querySelectorAll('.answer-btn');
+            eliminatedAnswers = [];
+            
+            buttons.forEach((btn, i) => {
+                document.getElementById(`answer${i}`).textContent = q.answers[i];
+                btn.classList.remove('selected', 'correct', 'incorrect', 'eliminated');
+                btn.disabled = false;
+            });
+            
+            selectedAnswer = null;
+            document.getElementById('confirmBtn').classList.add('hidden');
+            updateLadder();
+        }
+
+        function selectAnswer(index) {
+            if (!gameActive || eliminatedAnswers.includes(index)) return;
+            
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            
+            buttons[index].classList.add('selected');
+            selectedAnswer = index;
+            
+            document.getElementById('confirmBtn').classList.remove('hidden');
+        }
+
+        function confirmAnswer() {
+            if (selectedAnswer === null || !gameActive) return;
+            
+            gameActive = false;
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            buttons.forEach(btn => btn.disabled = true);
+            document.getElementById('confirmBtn').classList.add('hidden');
+            
+            setTimeout(() => {
+                if (selectedAnswer === q.correct) {
+                    buttons[selectedAnswer].classList.remove('selected');
+                    buttons[selectedAnswer].classList.add('correct');
+                    
+                    setTimeout(() => {
+                        if (currentQuestion === questions.length - 1) {
+                            showResult('win', 'CONGRATULATIONS!', 'You are a Waves & Sound MILLIONAIRE!', prizeAmounts[currentQuestion]);
+                        } else {
+                            currentQuestion++;
+                            gameActive = true;
+                            loadQuestion();
+                        }
+                    }, 2000);
+                } else {
+                    buttons[selectedAnswer].classList.remove('selected');
+                    buttons[selectedAnswer].classList.add('incorrect');
+                    buttons[q.correct].classList.add('correct');
+                    
+                    let guaranteedPrize = "$0";
+                    for (let i = currentQuestion - 1; i >= 0; i--) {
+                        if (milestones.includes(i)) {
+                            guaranteedPrize = prizeAmounts[i];
+                            break;
+                        }
+                    }
+                    
+                    setTimeout(() => {
+                        showResult('lose', 'GAME OVER', `The correct answer was: ${q.answers[q.correct]}`, guaranteedPrize, q.explanation);
+                    }, 2500);
+                }
+            }, 1500);
+        }
+
+        function walkAway() {
+            if (currentQuestion === 0) {
+                showResult('info', 'Walking Away', 'You leave with nothing... but you never tried!', "$0");
+            } else {
+                const prize = prizeAmounts[currentQuestion - 1];
+                showResult('win', 'Smart Move!', 'You decided to walk away with your winnings.', prize);
+            }
+        }
+
+        function showResult(type, title, text, amount, extra = '') {
+            const modal = document.getElementById('resultModal');
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalTitle').className = `modal-title ${type}`;
+            document.getElementById('modalText').textContent = text;
+            document.getElementById('modalAmount').textContent = amount;
+            document.getElementById('modalExtra').innerHTML = extra ? `<p style="margin-top: 15px; font-size: 0.95rem; opacity: 0.8; font-style: italic;">${extra}</p>` : '';
+            modal.classList.add('active');
+        }
+
+        function playAgain() {
+            document.getElementById('resultModal').classList.remove('active');
+            document.getElementById('gameArea').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+        }
+
+        function use5050() {
+            if (!lifelines.fiftyFifty || !gameActive) return;
+            
+            lifelines.fiftyFifty = false;
+            document.getElementById('lifeline5050').classList.add('used');
+            document.getElementById('lifeline5050').disabled = true;
+            
+            const q = questions[currentQuestion];
+            const wrongAnswers = [0, 1, 2, 3].filter(i => i !== q.correct);
+            const toEliminate = wrongAnswers.sort(() => Math.random() - 0.5).slice(0, 2);
+            eliminatedAnswers = toEliminate;
+            
+            const buttons = document.querySelectorAll('.answer-btn');
+            toEliminate.forEach(i => {
+                buttons[i].classList.add('eliminated');
+                buttons[i].disabled = true;
+            });
+        }
+
+        function usePhoneFriend() {
+            if (!lifelines.phone || !gameActive) return;
+            
+            lifelines.phone = false;
+            document.getElementById('lifelinePhone').classList.add('used');
+            document.getElementById('lifelinePhone').disabled = true;
+            
+            const q = questions[currentQuestion];
+            const letters = ['A', 'B', 'C', 'D'];
+            
+            const isCorrect = Math.random() < 0.80;
+            const certainty = isCorrect ? Math.floor(Math.random() * 20) + 75 : Math.floor(Math.random() * 30) + 30;
+            
+            let friendAnswer;
+            if (isCorrect) {
+                friendAnswer = q.correct;
+            } else {
+                const wrongAnswers = [0, 1, 2, 3].filter(i => i !== q.correct && !eliminatedAnswers.includes(i));
+                friendAnswer = wrongAnswers[Math.floor(Math.random() * wrongAnswers.length)];
+            }
+            
+            const friendNames = ["Dr. Wave", "Professor Sound", "Physics Phil", "Sarah the Scientist"];
+            const friendName = friendNames[Math.floor(Math.random() * friendNames.length)];
+            
+            const responses = [
+                `Hmm, let me think... I'm about ${certainty}% sure the answer is ${letters[friendAnswer]}: ${q.answers[friendAnswer]}. Good luck!`,
+                `Oh, I know this one! I'd go with ${letters[friendAnswer]}: ${q.answers[friendAnswer]}. I'm ${certainty}% confident.`,
+                `Interesting question! I think it's ${letters[friendAnswer]}: ${q.answers[friendAnswer]}. About ${certainty}% sure.`
+            ];
+            
+            document.getElementById('lifelineTitle').textContent = '📞 Phone a Friend';
+            document.getElementById('lifelineContent').innerHTML = `
+                <div class="friend-message">
+                    <span class="friend-name">${friendName}:</span> "${responses[Math.floor(Math.random() * responses.length)]}"
+                </div>
+            `;
+            document.getElementById('lifelineModal').classList.add('active');
+        }
+
+        function useAskAudience() {
+            if (!lifelines.audience || !gameActive) return;
+            
+            lifelines.audience = false;
+            document.getElementById('lifelineAudience').classList.add('used');
+            document.getElementById('lifelineAudience').disabled = true;
+            
+            const q = questions[currentQuestion];
+            const letters = ['A', 'B', 'C', 'D'];
+            
+            let percentages = [0, 0, 0, 0];
+            const correctWeight = 50 + Math.floor(Math.random() * 30);
+            percentages[q.correct] = correctWeight;
+            
+            let remaining = 100 - correctWeight;
+            const availableWrong = [0, 1, 2, 3].filter(i => i !== q.correct && !eliminatedAnswers.includes(i));
+            
+            availableWrong.forEach((i, idx) => {
+                if (idx === availableWrong.length - 1) {
+                    percentages[i] = remaining;
+                } else {
+                    const portion = Math.floor(Math.random() * (remaining * 0.7));
+                    percentages[i] = portion;
+                    remaining -= portion;
+                }
+            });
+            
+            document.getElementById('lifelineTitle').textContent = '👥 Ask the Audience';
+            document.getElementById('lifelineContent').innerHTML = `
+                <div class="poll-results">
+                    ${[0, 1, 2, 3].map(i => `
+                        <div class="poll-bar" style="${eliminatedAnswers.includes(i) ? 'opacity: 0.3;' : ''}">
+                            <div class="poll-percent">${percentages[i]}%</div>
+                            <div class="poll-bar-container">
+                                <div class="poll-bar-fill ${i === q.correct ? 'highlight' : ''}" style="height: ${percentages[i]}%;"></div>
+                            </div>
+                            <div class="poll-label">${letters[i]}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            document.getElementById('lifelineModal').classList.add('active');
+        }
+
+        function closeLifelineModal() {
+            document.getElementById('lifelineModal').classList.remove('active');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (!gameActive) return;
+            const key = e.key.toUpperCase();
+            if (['A', '1'].includes(key)) selectAnswer(0);
+            if (['B', '2'].includes(key)) selectAnswer(1);
+            if (['C', '3'].includes(key)) selectAnswer(2);
+            if (['D', '4'].includes(key)) selectAnswer(3);
+            if (e.key === 'Enter' && selectedAnswer !== null) confirmAnswer();
+        });
+    </script>
+</body>
+</html>
